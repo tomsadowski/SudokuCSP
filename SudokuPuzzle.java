@@ -1,6 +1,6 @@
 package sudoku;
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.Scanner;
 public class SudokuPuzzle {
 
 	int[][][][] puzzle = new int[3][3][3][3] ;

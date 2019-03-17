@@ -1,6 +1,4 @@
 package sudoku;
-import java.io.*;
-import java.util.*;
 public class SudokuSolverTest {
 	public static void main(String[] args) throws Exception {
 		// checks that an argument has been passed
