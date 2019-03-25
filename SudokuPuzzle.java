@@ -4,11 +4,14 @@ import java.util.Scanner;
 import java.util.ArrayList;
 public class SudokuPuzzle {
 
-	int[][][][] puzzle = new int[3][3][3][3];
-	ArrayList[][][][] domains = new ArrayList[3][3][3][3];
+	int[][][][] puzzle;
+	ArrayList[][][][] domains;
 
 	public SudokuPuzzle(String filePath) throws Exception {
 		Scanner sc = new Scanner(new File(filePath));
+		puzzle = new int[3][3][3][3];
+		domains = new ArrayList[3][3][3][3];
+
  		/* 
 		* Loads the puzzle and the initial domains of the puzzle
 		* br = block row
@@ -20,10 +23,10 @@ public class SudokuPuzzle {
 			for (int r = 0; r < 3; r++)  
 				for (int bc = 0; bc < 3; bc++) 
 					for (int c = 0; c < 3; c++) { 
-						puzzle[r][c][br][bc] = sc.nextInt();	
-						if (puzzle[r][c][br][bc] != 0) {	
+						int val = sc.nextInt();	
+						if (val != 0) {	
 				  			domains[r][c][br][bc] = new ArrayList();
-							domains[r][c][br][bc].add(puzzle[r][c][br][bc]);
+							domains[r][c][br][bc].add(val);
 						}
 						else {
 							domains[r][c][br][bc] = new ArrayList(9);
@@ -31,6 +34,47 @@ public class SudokuPuzzle {
 								domains[r][c][br][bc].add(i);
 						}
 					 }	
+	}
+
+	public void propagateConstraints() {
+		boolean exploreAgain = true;
+		while (exploreAgain) { 
+			exploreAgain = false;
+			for (int br = 0; br < 3; br++) 
+				for (int r = 0; r < 3; r++)   
+					for (int bc = 0; bc < 3; bc++)  
+						for (int c = 0; c < 3; c++) {
+							if (domains[r][c][br][bc].size() == 1 && puzzle[r][c][br][bc] == 0) {
+								exploreAgain = true;
+								puzzle[r][c][br][bc] = (int)domains[r][c][br][bc].get(0);
+								removeFromNeighbors(r, c, br, bc);  
+							}
+						}			
+		}
+	}
+
+	private void removeFromNeighbors(int _r, int _c, int _br, int _bc) {
+		for (int r = 0; r < 3; r++)  
+			for (int c = 0; c < 3; c++) 
+				if (r != _r || c != _c) {
+					int index = domains[r][c][_br][_bc].indexOf(puzzle[_r][_c][_br][_bc]);
+					if (index != -1)
+						domains[r][c][_br][_bc].remove(index);
+				}
+		for (int br = 0; br < 3; br++) 
+			if (br != _br) 
+				for (int r = 0; r < 3; r++) {
+					int index = domains[r][_c][br][_bc].indexOf(puzzle[_r][_c][_br][_bc]);
+					if (index != -1)
+						domains[r][_c][br][_bc].remove(index);
+				}
+		for (int bc = 0; bc < 3; bc++) 
+			if (bc != _bc) 
+				for (int c = 0; c < 3; c++) {
+					int index = domains[_r][c][_br][bc].indexOf(puzzle[_r][_c][_br][_bc]);
+					if (index != -1)
+						domains[_r][c][_br][bc].remove(index);
+				}
 	}
 
 	@Override
