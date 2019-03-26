@@ -4,15 +4,15 @@ import java.util.Scanner;
 import java.util.ArrayList;
 public class SudokuPuzzle {
 
-	private int[][][][] puzzle;
+	private int[][][][] exploredMatrix;
 	private ArrayList[][][][] domains;
 
 	public SudokuPuzzle(String filePath) throws Exception {
 		Scanner sc = new Scanner(new File(filePath));
-		puzzle = new int[3][3][3][3];
+		exploredMatrix = new int[3][3][3][3];
 		domains = new ArrayList[3][3][3][3];
  		/* 
-		* Loads the initial domains of the puzzle
+		* Loads the initial domains of the exploredMatrix 
 		* br = block row
 		* r = row
 		* bc = block column
@@ -42,23 +42,24 @@ public class SudokuPuzzle {
 			for (int br = 0; br < 3; br++) 
 				for (int r = 0; r < 3; r++)   
 					for (int bc = 0; bc < 3; bc++)  
-						for (int c = 0; c < 3; c++) {
-							if (domains[r][c][br][bc].size() == 1 && puzzle[r][c][br][bc] == 0) {
+						for (int c = 0; c < 3; c++) 
+							if (domains[r][c][br][bc].size() == 1 && 
+							exploredMatrix[r][c][br][bc] != 1) {
 								exploreAgain = true;
-								puzzle[r][c][br][bc] = (int)domains[r][c][br][bc].get(0);
-								removeFromNeighbors(r, c, br, bc);  
+								exploredMatrix[r][c][br][bc] = 1;
+								removeSingletonValue((int)domains[r][c][br][bc].get(0),
+								r, c, br, bc);  
 							}
-						}			
 		}
 	}
 
 	// helper for singletonInference 
-	private void removeFromNeighbors(int _r, int _c, int _br, int _bc) {
+	private void removeSingletonValue(int _val, int _r, int _c, int _br, int _bc) {
 		// removes value from variable's block
 		for (int r = 0; r < 3; r++)  
 			for (int c = 0; c < 3; c++) 
 				if (r != _r || c != _c) {
-					int index = domains[r][c][_br][_bc].indexOf(puzzle[_r][_c][_br][_bc]);
+					int index = domains[r][c][_br][_bc].indexOf(_val);
 					if (index != -1)
 						domains[r][c][_br][_bc].remove(index);
 				}
@@ -66,7 +67,7 @@ public class SudokuPuzzle {
 		for (int br = 0; br < 3; br++) 
 			if (br != _br) 
 				for (int r = 0; r < 3; r++) {
-					int index = domains[r][_c][br][_bc].indexOf(puzzle[_r][_c][_br][_bc]);
+					int index = domains[r][_c][br][_bc].indexOf(_val);
 					if (index != -1)
 						domains[r][_c][br][_bc].remove(index);
 				}
@@ -74,7 +75,7 @@ public class SudokuPuzzle {
 		for (int bc = 0; bc < 3; bc++) 
 			if (bc != _bc) 
 				for (int c = 0; c < 3; c++) {
-					int index = domains[_r][c][_br][bc].indexOf(puzzle[_r][_c][_br][_bc]);
+					int index = domains[_r][c][_br][bc].indexOf(_val);
 					if (index != -1)
 						domains[_r][c][_br][bc].remove(index);
 				}
@@ -85,21 +86,20 @@ public class SudokuPuzzle {
 			for (int r = 0; r < 3; r++)   
 				for (int bc = 0; bc < 3; bc++)  
 					for (int c = 0; c < 3; c++) 
-						if (puzzle[r][c][br][bc] == 0)
+						if (exploredMatrix[r][c][br][bc] != 1)
 							return false;
 		return true;		
-	
 	}
 
 	@Override
 	public String toString() {
 		String str = "";
-		// print puzzle
+		// print exploredMatrix 
 		for (int br = 0; br < 3; br++) {
 			for (int r = 0; r < 3; r++) {  
 				for (int bc = 0; bc < 3; bc++) { 
 					for (int c = 0; c < 3; c++) {
-						str = str + Integer.toString(puzzle[r][c][br][bc]) + " ";		
+						str = str + Integer.toString(exploredMatrix[r][c][br][bc]) + " ";		
 					}
 					str = str + "| ";
 				}
