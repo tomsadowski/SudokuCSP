@@ -3,8 +3,18 @@ import java.io.File;
 import java.util.Scanner;
 import java.util.ArrayList;
 public class SudokuPuzzle {
-
+	/*
+	* Initializes all entries to 0
+	* Each entry corresponds to an entry (domain) in domains
+	* Each entry will be updated with the size of its corresponding domain after the variable is explored
+	* by the appropriate means of inference, thus eliminating it from any further exploration
+	* by the same means of inference
+	*/
 	private int[][][][] exploredMatrix;
+	/*
+	* Initializes all non-singleton variables to the widest domain
+	* Intializes all singleton variables to the value from the puzzle
+	*/
 	private ArrayList[][][][] domains;
 
 	public SudokuPuzzle(String filePath) throws Exception {
@@ -12,7 +22,7 @@ public class SudokuPuzzle {
 		exploredMatrix = new int[3][3][3][3];
 		domains = new ArrayList[3][3][3][3];
  		/* 
-		* Loads the initial domains of the exploredMatrix 
+		* Loads the initial domains
 		* br = block row
 		* r = row
 		* bc = block column
@@ -91,6 +101,13 @@ public class SudokuPuzzle {
 		return true;		
 	}
 
+	private String domainString(ArrayList domain) {
+		String str = "";
+		for (int i = 0; i < domain.size(); i++)
+			str = str + domain.get(i);
+		return str;
+	}
+
 	@Override
 	public String toString() {
 		String str = "";
@@ -123,11 +140,4 @@ public class SudokuPuzzle {
 		}	 
 		return str;
 	}	
-	
-	private String domainString(ArrayList domain) {
-		String str = "";
-		for (int i = 0; i < domain.size(); i++)
-			str = str + domain.get(i);
-		return str;
-	}
 }
