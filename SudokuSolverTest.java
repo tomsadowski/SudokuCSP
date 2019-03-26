@@ -8,11 +8,9 @@ public class SudokuSolverTest {
 			System.exit(0);
 		}
 		
-	//	for (String arg : args) 
-	//		System.out.println(new SudokuPuzzle(arg));
 		SudokuPuzzle sudoku = new SudokuPuzzle(args[0]);
 		System.out.println(sudoku);
-		sudoku.propagateConstraints();
+		sudoku.singletonInference();
 		System.out.println(sudoku);	
 		
 				

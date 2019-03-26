@@ -4,16 +4,15 @@ import java.util.Scanner;
 import java.util.ArrayList;
 public class SudokuPuzzle {
 
-	int[][][][] puzzle;
-	ArrayList[][][][] domains;
+	private int[][][][] puzzle;
+	private ArrayList[][][][] domains;
 
 	public SudokuPuzzle(String filePath) throws Exception {
 		Scanner sc = new Scanner(new File(filePath));
 		puzzle = new int[3][3][3][3];
 		domains = new ArrayList[3][3][3][3];
-
  		/* 
-		* Loads the puzzle and the initial domains of the puzzle
+		* Loads the initial domains of the puzzle
 		* br = block row
 		* r = row
 		* bc = block column
@@ -36,7 +35,7 @@ public class SudokuPuzzle {
 					 }	
 	}
 
-	public void propagateConstraints() {
+	public void singletonInference() {
 		boolean exploreAgain = true;
 		while (exploreAgain) { 
 			exploreAgain = false;
@@ -53,7 +52,9 @@ public class SudokuPuzzle {
 		}
 	}
 
+	// helper for singletonInference 
 	private void removeFromNeighbors(int _r, int _c, int _br, int _bc) {
+		// removes value from variable's block
 		for (int r = 0; r < 3; r++)  
 			for (int c = 0; c < 3; c++) 
 				if (r != _r || c != _c) {
@@ -61,6 +62,7 @@ public class SudokuPuzzle {
 					if (index != -1)
 						domains[r][c][_br][_bc].remove(index);
 				}
+		// removes value from variable's column
 		for (int br = 0; br < 3; br++) 
 			if (br != _br) 
 				for (int r = 0; r < 3; r++) {
@@ -68,6 +70,7 @@ public class SudokuPuzzle {
 					if (index != -1)
 						domains[r][_c][br][_bc].remove(index);
 				}
+		// removes value from variable's row
 		for (int bc = 0; bc < 3; bc++) 
 			if (bc != _bc) 
 				for (int c = 0; c < 3; c++) {
@@ -75,6 +78,17 @@ public class SudokuPuzzle {
 					if (index != -1)
 						domains[_r][c][_br][bc].remove(index);
 				}
+	}
+
+	public boolean isSolved() {
+		for (int br = 0; br < 3; br++) 
+			for (int r = 0; r < 3; r++)   
+				for (int bc = 0; bc < 3; bc++)  
+					for (int c = 0; c < 3; c++) 
+						if (puzzle[r][c][br][bc] == 0)
+							return false;
+		return true;		
+	
 	}
 
 	@Override
