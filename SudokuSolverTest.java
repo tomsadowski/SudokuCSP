@@ -13,7 +13,7 @@ public class SudokuSolverTest {
 		boolean loop = true;
 		while (loop) {
 			loop = false;
-			for (int m = 1; m <= 2; m++) 
+			for (int m = 1; m <= 4; m++) 
 				if (sudoku.inference(m))
 					loop = true;
 		} 		

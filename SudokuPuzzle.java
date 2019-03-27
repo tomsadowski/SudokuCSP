@@ -4,13 +4,13 @@ import java.util.Scanner;
 import java.util.ArrayList;
 public class SudokuPuzzle {
 	/*
-	* Initializes all entries to 0
+	* Initializes all entries to false
 	* Each entry corresponds to an entry (domain) in domains
 	* Each entry will be updated with the size of its corresponding domain after the variable is explored
 	* by the appropriate method of inference, thus eliminating it from any further exploration
 	* by the same method of inference
 	*/
-	private int[][][][] exploredMatrix;
+	private boolean[][][][] exploredSingletons;
 	/*
 	* Initializes all non-singleton variables to the widest domain
 	* Intializes all singleton variables to the value from the puzzle
@@ -19,7 +19,7 @@ public class SudokuPuzzle {
 
 	public SudokuPuzzle(String filePath) throws Exception {
 		Scanner sc = new Scanner(new File(filePath));
-		exploredMatrix = new int[3][3][3][3];
+		exploredSingletons = new boolean[3][3][3][3];
 		domains = new ArrayList[3][3][3][3];
  		/* 
 		* Loads the initial domains
@@ -49,85 +49,91 @@ public class SudokuPuzzle {
 		boolean removed = false;
 		boolean exploreAgain = true;
 		while (exploreAgain) { 
+			boolean[][][][] explored = new boolean[3][3][3][3];
 			exploreAgain = false;
 			for (int br = 0; br < 3; br++) 
 				for (int r = 0; r < 3; r++)   
 					for (int bc = 0; bc < 3; bc++)  
 						for (int c = 0; c < 3; c++) 
-							if (domains[r][c][br][bc].size() == _mag && 
-							exploredMatrix[r][c][br][bc] != _mag) {
-								exploreAgain = true;
-								exploredMatrix[r][c][br][bc] = _mag;
-								if (searchUnits(_mag, r, c, br, bc))
-									removed = true;
-							}
+							if (_mag != 1 || !exploredSingletons[r][c][br][bc])
+								if (domains[r][c][br][bc].size() == _mag) {
+									if (_mag == 1)
+										exploredSingletons[r][c][br][bc] = true;
+									explored[r][c][br][bc] = true;	
+									if (searchUnits(explored, r, c, br, bc)) {
+										exploreAgain = true;
+										removed = true;
+									}
+								}
 		}
 		return removed;
 	}
 
-	private boolean searchUnits(int _mag, int _r, int _c, int _br, int _bc) {
-		// search row
+	private boolean searchUnits(boolean[][][][] _explored, int _r, int _c, int _br, int _bc) {
+		int mag = domains[_r][_c][_br][_bc].size();
 		boolean removed = false;
+		// search row
 		int quantity = 1;
-		int[][][][] inferenceVariables = new int[3][3][3][3];
-		inferenceVariables[_r][_c][_br][_bc] = 1;
+		boolean[][][][] inferenceVariables = new boolean[3][3][3][3];
+		inferenceVariables[_r][_c][_br][_bc] = true;
 		for (int bc = 0; bc < 3; bc++)
 			for (int c = 0; c < 3; c++) {
-				if (quantity < _mag)	
-					if (exploredMatrix[_r][c][_br][bc] != _mag && 
-					domains[_r][c][_br][bc].size() <= _mag && domains[_r][c][_br][bc].size() > 1)
+				if (quantity < mag)	
+					if (!_explored[_r][c][_br][bc] && 
+					domains[_r][c][_br][bc].size() <= mag && domains[_r][c][_br][bc].size() > 1)
 						if (isSubset(domains[_r][_c][_br][_bc], domains[_r][c][_br][bc])) {
 							quantity++;
-							inferenceVariables[_r][c][_br][bc] = 1;
+							inferenceVariables[_r][c][_br][bc] = true;
 						}
-				if (quantity == _mag)
+				if (quantity == mag) 
 					if (remove('r', _r, _c, _br, _bc, inferenceVariables))
 						removed = true;
 			}
 		// search column
 		quantity = 1;
-		inferenceVariables = new int[3][3][3][3];
-		inferenceVariables[_r][_c][_br][_bc] = 1;
+		inferenceVariables = new boolean[3][3][3][3];
+		inferenceVariables[_r][_c][_br][_bc] = true;
 		for (int br = 0; br < 3; br++)		
 			for (int r = 0; r < 3; r++) {
-				if (quantity < _mag)	
-					if (exploredMatrix[r][_c][br][_bc] != _mag && 
-					domains[r][_c][br][_bc].size() <= _mag && domains[r][_c][br][_bc].size() > 1)
+				if (quantity < mag)	
+					if (!_explored[r][_c][br][_bc] && 
+					domains[r][_c][br][_bc].size() <= mag && domains[r][_c][br][_bc].size() > 1)
 						if (isSubset(domains[_r][_c][_br][_bc], domains[r][_c][br][_bc])) {
 							quantity++;
-							inferenceVariables[r][_c][br][_bc] = 1;
+							inferenceVariables[r][_c][br][_bc] = true;
 						}
-				if (quantity == _mag)
+				if (quantity == mag)
 					if (remove('c', _r, _c, _br, _bc, inferenceVariables))
 						removed = true;
 			}
 		// search block
 		quantity = 1;
-		inferenceVariables = new int[3][3][3][3];
-		inferenceVariables[_r][_c][_br][_bc] = 1;
+		inferenceVariables = new boolean[3][3][3][3];
+		inferenceVariables[_r][_c][_br][_bc] = true;
 		for (int r = 0; r < 3; r++)
 			for (int c = 0; c < 3; c++) {
-				if (quantity < _mag)	
-					if (exploredMatrix[r][c][_br][_bc] != _mag && 
-					domains[r][c][_br][_bc].size() <= _mag && domains[r][c][_br][_bc].size() > 1)
+				if (quantity < mag)	
+					if (!_explored[r][c][_br][_bc] && 
+					domains[r][c][_br][_bc].size() <= mag && domains[r][c][_br][_bc].size() > 1)
 						if (isSubset(domains[_r][_c][_br][_bc], domains[r][c][_br][_bc])) {
 							quantity++;
-							inferenceVariables[r][c][_br][_bc] = 1;
+							inferenceVariables[r][c][_br][_bc] = true;
 						}
-				if (quantity == _mag)
+				if (quantity == mag)
 					if (remove('b', _r, _c, _br, _bc, inferenceVariables))
 						removed = true;
 			}
 		return removed;
 	} 
 
-	private boolean remove(char _unit, int _r, int _c, int _br, int _bc, int[][][][] _inferenceVariables) {
+	private boolean remove(char _unit, int _r, int _c, int _br, int _bc, boolean[][][][] _inferenceVariables) {
 		boolean removed = false;
 		switch (_unit) {
+			// removes values from row
 			case 'r':
 				for (int bc = 0; bc < 3; bc++)
 					for (int c = 0; c < 3; c++) 
-						if (_inferenceVariables[_r][c][_br][bc] != 1)
+						if (!_inferenceVariables[_r][c][_br][bc])
 							for (int i = 0; i < domains[_r][_c][_br][_bc].size(); i++) {
 								int index = domains[_r][c][_br][bc].indexOf(
 								domains[_r][_c][_br][_bc].get(i));
@@ -137,10 +143,11 @@ public class SudokuPuzzle {
 								}
 							}
 				break;
+			// removes values from column
 			case 'c':
 				for (int br = 0; br < 3; br++)		
 					for (int r = 0; r < 3; r++) 
-						if (_inferenceVariables[r][_c][br][_bc] != 1)
+						if (!_inferenceVariables[r][_c][br][_bc])
 							for (int i = 0; i < domains[_r][_c][_br][_bc].size(); i++) {
 								int index = domains[r][_c][br][_bc].indexOf(
 								domains[_r][_c][_br][_bc].get(i));
@@ -150,10 +157,11 @@ public class SudokuPuzzle {
 								}
 							}
 				break;
+			// removes values from block
 			case 'b': 
 				for (int r = 0; r < 3; r++)
 					for (int c = 0; c < 3; c++) 
-						if (_inferenceVariables[r][c][_br][_bc] != 1)
+						if (!_inferenceVariables[r][c][_br][_bc])
 							for (int i = 0; i < domains[_r][_c][_br][_bc].size(); i++) {
 								int index = domains[r][c][_br][_bc].indexOf(
 								domains[_r][_c][_br][_bc].get(i));
@@ -181,7 +189,7 @@ public class SudokuPuzzle {
 			for (int r = 0; r < 3; r++)   
 				for (int bc = 0; bc < 3; bc++)  
 					for (int c = 0; c < 3; c++) 
-						if (exploredMatrix[r][c][br][bc] != 1)
+						if (domains[r][c][br][bc].size() != 1)
 							return false;
 		return true;		
 	}
@@ -201,13 +209,13 @@ public class SudokuPuzzle {
 			for (int r = 0; r < 3; r++) {  
 				for (int bc = 0; bc < 3; bc++) { 
 					for (int c = 0; c < 3; c++) {
-						str = str + Integer.toString(exploredMatrix[r][c][br][bc]) + " ";		
+						str = str + String.format("%-6b", exploredSingletons[r][c][br][bc]);		
 					}
 					str = str + "| ";
 				}
 				str = str + "\n";
 			}
-			str = str + "-----------------------\n";
+			str = str + "\n";
 		}	
 		str = str + "\n\n";
 		// print domains
