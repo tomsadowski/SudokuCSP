@@ -11,12 +11,12 @@ public class SudokuSolverTest {
 		SudokuPuzzle sudoku = new SudokuPuzzle(args[0]);
 		System.out.println(sudoku);
 		boolean loop = true;
-		while (loop)
+		while (loop) {
 			loop = false;
-			for (int m = 1; m <= 2; m++) {
+			for (int m = 1; m <= 2; m++) 
 				if (sudoku.inference(m))
 					loop = true;
-			} 		
+		} 		
 		System.out.println(sudoku);	
 		
 				

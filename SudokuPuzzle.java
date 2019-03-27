@@ -131,10 +131,11 @@ public class SudokuPuzzle {
 							for (int i = 0; i < domains[_r][_c][_br][_bc].size(); i++) {
 								int index = domains[_r][c][_br][bc].indexOf(
 								domains[_r][_c][_br][_bc].get(i));
-								if (index != -1)
+								if (index != -1) {
 									domains[_r][c][_br][bc].remove(index);
+									removed = true;
+								}
 							}
-									
 				break;
 			case 'c':
 				for (int br = 0; br < 3; br++)		
@@ -143,8 +144,10 @@ public class SudokuPuzzle {
 							for (int i = 0; i < domains[_r][_c][_br][_bc].size(); i++) {
 								int index = domains[r][_c][br][_bc].indexOf(
 								domains[_r][_c][_br][_bc].get(i));
-								if (index != -1)
+								if (index != -1) {
 									domains[r][_c][br][_bc].remove(index);
+									removed = true;
+								}
 							}
 				break;
 			case 'b': 
@@ -154,8 +157,10 @@ public class SudokuPuzzle {
 							for (int i = 0; i < domains[_r][_c][_br][_bc].size(); i++) {
 								int index = domains[r][c][_br][_bc].indexOf(
 								domains[_r][_c][_br][_bc].get(i));
-								if (index != -1)
+								if (index != -1) {
 									domains[r][c][_br][_bc].remove(index);
+									removed = true;
+								}
 							}
 				break;
 			default:
@@ -165,7 +170,7 @@ public class SudokuPuzzle {
 	}  
 
 	private boolean isSubset(ArrayList _domain1, ArrayList _domain2) {
-		for (int i = 1; i < _domain2.size(); i++) 
+		for (int i = 0; i < _domain2.size(); i++) 
 			if (!_domain1.contains(_domain2.get(i)))
 				return false;
 		return true;		
