@@ -7,8 +7,8 @@ public class SudokuPuzzle {
 	* Initializes all entries to 0
 	* Each entry corresponds to an entry (domain) in domains
 	* Each entry will be updated with the size of its corresponding domain after the variable is explored
-	* by the appropriate means of inference, thus eliminating it from any further exploration
-	* by the same means of inference
+	* by the appropriate method of inference, thus eliminating it from any further exploration
+	* by the same method of inference
 	*/
 	private int[][][][] exploredMatrix;
 	/*
@@ -45,7 +45,8 @@ public class SudokuPuzzle {
 					 }	
 	}
 
-	public void singletonInference() {
+	public boolean inference(int _mag) {
+		boolean removed = false;
 		boolean exploreAgain = true;
 		while (exploreAgain) { 
 			exploreAgain = false;
@@ -53,44 +54,78 @@ public class SudokuPuzzle {
 				for (int r = 0; r < 3; r++)   
 					for (int bc = 0; bc < 3; bc++)  
 						for (int c = 0; c < 3; c++) 
-							if (domains[r][c][br][bc].size() == 1 && 
-							exploredMatrix[r][c][br][bc] != 1) {
+							if (domains[r][c][br][bc].size() == _mag && 
+							exploredMatrix[r][c][br][bc] != _mag) {
 								exploreAgain = true;
-								exploredMatrix[r][c][br][bc] = 1;
-								removeSingletonValue((int)domains[r][c][br][bc].get(0),
-								r, c, br, bc);  
+								exploredMatrix[r][c][br][bc] = _mag;
+								if (searchUnits(_mag, r, c, br, bc))
+									removed = true;
 							}
 		}
+		return removed;
 	}
 
-	// helper for singletonInference 
-	private void removeSingletonValue(int _val, int _r, int _c, int _br, int _bc) {
-		// removes value from variable's block
-		for (int r = 0; r < 3; r++)  
-			for (int c = 0; c < 3; c++) 
-				if (r != _r || c != _c) {
-					int index = domains[r][c][_br][_bc].indexOf(_val);
-					if (index != -1)
-						domains[r][c][_br][_bc].remove(index);
-				}
-		// removes value from variable's column
-		for (int br = 0; br < 3; br++) 
-			if (br != _br) 
-				for (int r = 0; r < 3; r++) {
-					int index = domains[r][_c][br][_bc].indexOf(_val);
-					if (index != -1)
-						domains[r][_c][br][_bc].remove(index);
-				}
-		// removes value from variable's row
-		for (int bc = 0; bc < 3; bc++) 
-			if (bc != _bc) 
-				for (int c = 0; c < 3; c++) {
-					int index = domains[_r][c][_br][bc].indexOf(_val);
-					if (index != -1)
-						domains[_r][c][_br][bc].remove(index);
-				}
-	}
+	private boolean searchUnits(int _mag, int _r, _c, _br, _bc) {
+		// search row
+		int quantity = 1;
+		int[][][][] inferenceVariables = new int[3][3][3][3];
+		inferenceVariables[_r][_c][_br][_bc] = 1;
+		for (int bc = 0; bc < 3; bc++)
+			for (int c = 0; c < 3; c++) {
+				if (quantity < mag)	
+					if (c != _c || bc != _bc)
+						if (exploredMatrix != mag && 
+						domains[_r][c][_br][bc].size() <= mag && domains[_r][c][_br][bc].size() > 1)
+							if (isSubset(_r, _c, _br, _bc, _r, c, _br, bc)) {
+								quantity++;
+								inferenceVariables[_r][c][_br][bc] = 1;
+							}
+				if (quantity == mag)
+					remove('r', domains[_r][_c][_br][_bc], inferenceVariables);
+			}
+		// search column
+		int quantity = 1;
+		int[][][][] inferenceVariables = new int[3][3][3][3];
+		inferenceVariables[_r][_c][_br][_bc] = 1;
+		for (int br = 0; br < 3; br++)		
+			for (int r = 0; r < 3; r++) {
+				if (quantity < mag)	
+					if (r != _r || br != _br)
+						if (exploredMatrix != mag && 
+						domains[r][_c][br][_bc].size() <= mag && domains[r][_c][br][_bc].size() > 1)
+							if (isSubset(_r, _c, _br, _bc, r, _c, br, _bc)) {
+								quantity++;
+								inferenceVariables[r][_c][br][_bc] = 1;
+							}
+				if (quantity == mag)
+					remove('c', domains[_r][_c][_br][_bc], inferenceVariables);
+			}
+		// search block
+		int quantity = 1;
+		int[][][][] inferenceVariables = new int[3][3][3][3];
+		inferenceVariables[_r][_c][_br][_bc] = 1;
+		for (int r = 0; r < 3; r++)
+			for (int c = 0; c < 3; c++) {
+				if (quantity < mag)	
+					if (r != _r || c != _c)
+						if (exploredMatrix != mag && 
+						domains[r][c][_br][_bc].size() <= mag && domains[r][c][_br][_bc].size() > 1)
+							if (isSubset(_r, _c, _br, _bc, r, c, _br, _bc)) {
+								quantity++;
+								inferenceVariables[r][c][_br][_bc] = 1;
+							}
+				if (quantity == mag)
+					remove('b', domains[_r][_c][_br][_bc], inferenceVariables);
+			}
+	} 
 
+	private boolean isSubset(int r, int c, int br, int bc, int r2, int c2, int br2, int bc2) {
+		for (int i = 1; i < domains[r2][c2][br2][bc2].size(); i++) 
+			if (!domains[r][c][br][bc].contains(domains[r2][c2][br2][bc2].get(i))
+				return false;
+		return true;		
+	}
+	
 	public boolean isSolved() {
 		for (int br = 0; br < 3; br++) 
 			for (int r = 0; r < 3; r++)   
