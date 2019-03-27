@@ -10,7 +10,13 @@ public class SudokuSolverTest {
 		
 		SudokuPuzzle sudoku = new SudokuPuzzle(args[0]);
 		System.out.println(sudoku);
-		sudoku.singletonInference();
+		boolean loop = true;
+		while (loop)
+			loop = false;
+			for (int m = 1; m <= 2; m++) {
+				if (sudoku.inference(m))
+					loop = true;
+			} 		
 		System.out.println(sudoku);	
 		
 				
