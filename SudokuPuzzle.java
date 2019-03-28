@@ -4,31 +4,31 @@ import java.util.Scanner;
 import java.util.ArrayList;
 public class SudokuPuzzle {
 	/*
-	* Initializes all entries to false
-	* Each entry corresponds to an entry (domain) in domains
-	* Each entry will be updated with the size of its corresponding domain after the variable is explored
-	* by the appropriate method of inference, thus eliminating it from any further exploration
-	* by the same method of inference
+	* Initializes all entries to false.
+	* Each entry corresponds to an entry (domain) in domains.
+	* Each entry will be updated to true if and only if its corresponding domain has been
+	* reduced to one value and that value has been reduced from all of its variable's neighbors. 
 	*/
 	private boolean[][][][] exploredSingletons;
 	/*
-	* Initializes all non-singleton variables to the widest domain
-	* Intializes all singleton variables to the value from the puzzle
+	* Initializes all non-singleton variables to the widest domain and
+	* intializes all singleton variables to the value from the puzzle.
 	*/
 	private ArrayList[][][][] domains;
-
+	/*
+	* @param filePath path to a text file that contains a
+	* sudoku puzzle represented only by integers
+	*/
 	public SudokuPuzzle(String filePath) throws Exception {
 		Scanner sc = new Scanner(new File(filePath));
 		exploredSingletons = new boolean[3][3][3][3];
-		domains = new ArrayList[3][3][3][3];
- 		/* 
-		* Loads the initial domains
-		* br = block row
-		* r = row
-		* bc = block column
-		* c = column
-		*/
- 		for (int br = 0; br < 3; br++)
+		domains = new ArrayList[3][3][3][3]; 
+	 	// Loads the initial domains
+		// br = block row
+		// r = row
+		// bc = block column
+		// c = column
+		for (int br = 0; br < 3; br++)
 			for (int r = 0; r < 3; r++)  
 				for (int bc = 0; bc < 3; bc++) 
 					for (int c = 0; c < 3; c++) { 
@@ -44,11 +44,24 @@ public class SudokuPuzzle {
 						}
 					 }	
 	}
-
+	/*
+	* Select _mag number of variables each with domain size of 
+	* at most _mag, (and at least 2 if _mag > 1), then use those variables to propagate constraints. 
+	*
+	* @param _mag "magnitude" of the constraint propagation (inference)
+	* @return true if and only if a value is removed from a variable by means of inference
+	*/
 	public boolean inference(int _mag) {
+		// returned value
 		boolean removed = false;
+		// assumed to be false at the beginning of each loop, is made true when a search returns true
 		boolean exploreAgain = true;
 		while (exploreAgain) { 
+			/* 
+			* similar to exploredSingletons, but it is for variables of 
+			* domain size > 1, and since variables with domain sizes > 1 are able to affect their neighbors
+			* differently between neighborhood searches, it is re-instantiated for each while loop
+			*/
 			boolean[][][][] explored = new boolean[3][3][3][3];
 			exploreAgain = false;
 			for (int br = 0; br < 3; br++) 
@@ -68,7 +81,16 @@ public class SudokuPuzzle {
 		}
 		return removed;
 	}
-
+	/*
+	* Searches every neighbor of a given variable for other variables with 
+	* related values and related size.
+	* 
+	* @param _explored see definition of explored in inference
+	* @param _r row of given variable
+	* @param _c column of given variable
+	* @param _br block row of given variable
+	* @param _bc block column of given variable
+	*/
 	private boolean searchUnits(boolean[][][][] _explored, int _r, int _c, int _br, int _bc) {
 		int mag = domains[_r][_c][_br][_bc].size();
 		boolean removed = false;
