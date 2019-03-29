@@ -268,20 +268,6 @@ public class SudokuPuzzle {
 	@Override
 	public String toString() {
 		String str = "";
-		// print exploredMatrix 
-		for (int br = 0; br < 3; br++) {
-			for (int r = 0; r < 3; r++) {  
-				for (int bc = 0; bc < 3; bc++) { 
-					for (int c = 0; c < 3; c++) {
-						str = str + String.format("%10d", assignments[r][c][br][bc]);		
-					}
-					str = str + "| ";
-				}
-				str = str + "\n";
-			}
-			str = str + "\n";
-		}	
-		str = str + "\n\n";
 		// print domains
 		for (int br = 0; br < 3; br++) {
 			for (int r = 0; r < 3; r++) {  
@@ -313,7 +299,7 @@ public class SudokuPuzzle {
 									s2.inference(1);
 									if (s2.isSolvable())
 										s2 = backtrack(s2);
-									if (s2.isSolved())
+									if (s2.isSolved()) 	
 										return s2; 
 								}
 								return s;
