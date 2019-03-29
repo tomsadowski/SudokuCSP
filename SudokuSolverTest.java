@@ -16,7 +16,8 @@ public class SudokuSolverTest {
 			for (int m = 1; m <= 4; m++) 
 				if (sudoku.inference(m))
 					loop = true;
-		} 		
+		}
+		sudoku = SudokuPuzzle.Search.backtrack(sudoku);		
 		System.out.println(sudoku);	
 		
 				
