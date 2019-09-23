@@ -28,8 +28,6 @@ public class SudokuSolverTest {
 		System.out.println(sudoku);
 		sudoku = SudokuPuzzle.Search.backtrack(sudoku);		
 		// prints the set of domains after DFS
-		System.out.println(sudoku);	
-		
-				
+		System.out.println(sudoku);				
 	}
 }
