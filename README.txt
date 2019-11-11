@@ -14,5 +14,5 @@ Output:
 	represent the possible values (domain) of that cell, given no knowledge of the cells that surround them.
 	-The second table will be the result of inference. The domains of each cell are as reduced as they can be
 	given the magnititude of inference that was passed to the main method.
-	-The last table will be the solution to the sudoku puzzle. This is accompplished using the backtracking 
+	-The last table will be the solution to the sudoku puzzle. This is accomplished using the backtracking 
 	algorithm, which always solves the puzzle.
